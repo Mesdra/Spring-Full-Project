@@ -1,13 +1,12 @@
-package com.mesdra.SpringProject.domain;
+package com.mesdra.SpringProject.domain.enums;
 
-public enum TipoCliente {
+public enum EstadoPagamento {
 
-	PESSOAFISICA(1, "Pessoa Física"), PESSOAJURIDICA(2, "Pessoa Juridica");
-
+	PENDENTE(1,"Pendente"),QUITADO(2,"Quitado"),CANCELADO(3,"Cancelado");
 	private int cod;
 	private String desc;
 
-	private TipoCliente(int cod, String desc) {
+	private EstadoPagamento(int cod, String desc) {
 		this.cod = cod;
 		this.desc = desc;
 	}
@@ -20,14 +19,15 @@ public enum TipoCliente {
 		return desc;
 	}
 
-	public static TipoCliente toEnum(Integer cod) {
+	public static EstadoPagamento toEnum(Integer cod) {
 		if (cod == null) {
 			return null;
 		}
-		for (TipoCliente x : TipoCliente.values()) {
+		for (EstadoPagamento x : EstadoPagamento.values()) {
 			if (cod.equals(x.getCod()))
 				return x;
 		}
 		throw new IllegalArgumentException("id invalido" + cod);
 	}
+	
 }

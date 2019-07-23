@@ -1,5 +1,6 @@
 package com.mesdra.SpringProject;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,22 @@ import com.mesdra.SpringProject.domain.Cidade;
 import com.mesdra.SpringProject.domain.Cliente;
 import com.mesdra.SpringProject.domain.Endereco;
 import com.mesdra.SpringProject.domain.Estado;
+import com.mesdra.SpringProject.domain.ItemPedido;
+import com.mesdra.SpringProject.domain.Pagamento;
+import com.mesdra.SpringProject.domain.PagamentoComBoleto;
+import com.mesdra.SpringProject.domain.PagamentoComCartao;
+import com.mesdra.SpringProject.domain.Pedido;
 import com.mesdra.SpringProject.domain.Produto;
-import com.mesdra.SpringProject.domain.TipoCliente;
+import com.mesdra.SpringProject.domain.enums.EstadoPagamento;
+import com.mesdra.SpringProject.domain.enums.TipoCliente;
 import com.mesdra.SpringProject.repositories.CategoriaRepository;
 import com.mesdra.SpringProject.repositories.CidadeRepository;
 import com.mesdra.SpringProject.repositories.ClienteRepository;
 import com.mesdra.SpringProject.repositories.EnderecoRepository;
 import com.mesdra.SpringProject.repositories.EstadoRepository;
+import com.mesdra.SpringProject.repositories.ItemPedidoRepository;
+import com.mesdra.SpringProject.repositories.PagamentoRepository;
+import com.mesdra.SpringProject.repositories.PedidoRepository;
 import com.mesdra.SpringProject.repositories.ProdutoRepository;
 
 @SpringBootApplication
@@ -36,6 +46,12 @@ public class SpringFullProjectApplication implements CommandLineRunner {
 	private ClienteRepository clienteRepository;
 	@Autowired
 	private EnderecoRepository enderecoRepository;
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
+	@Autowired
+	private ItemPedidoRepository itemPedidoRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringFullProjectApplication.class, args);
@@ -86,5 +102,33 @@ public class SpringFullProjectApplication implements CommandLineRunner {
 
 		clienteRepository.saveAll(Arrays.asList(cli1));
 		enderecoRepository.saveAll(Arrays.asList(e1, e2));
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+		Pedido ped1 = new Pedido(null, sdf.parse("30/09/2017 10:32"), cli1, e1);
+		Pedido ped2 = new Pedido(null, sdf.parse("10/10/2017 19:35"), cli1, e2); 
+
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
+		ped1.setPagamento(pagto1);
+
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("20/10/2017 00:00"), null);
+		ped2.setPagamento(pagto2);
+
+		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+
+		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
+		
+		ItemPedido ip1 = new ItemPedido(ped1, p1, 0.00, 1, 2000.00);
+		ItemPedido ip2 = new ItemPedido(ped1, p3, 0.00, 2, 80.00);
+		ItemPedido ip3 = new ItemPedido(ped2, p2, 100.00, 1, 800.00);
+
+		ped1.getItens().addAll(Arrays.asList(ip1, ip2));
+		ped2.getItens().addAll(Arrays.asList(ip3));
+
+		p1.getItens().addAll(Arrays.asList(ip1));
+		p2.getItens().addAll(Arrays.asList(ip3));
+		p3.getItens().addAll(Arrays.asList(ip2));
+
+		itemPedidoRepository.saveAll(Arrays.asList(ip1, ip2, ip3));		
 	}
 }
